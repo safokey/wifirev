@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Révisions Wi-Fi — 802.11</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #F6F8F9;
+    --surface: #FFFFFF;
+    --surface-2: #EEF3F3;
+    --ink: #16232B;
+    --ink-soft: #4C5C63;
+    --muted: #7C8C93;
+    --accent: #2F6F6B;
+    --accent-2: #3A6EA5;
+    --accent-soft: #DCEDEA;
+    --accent-soft-2: #E2EBF5;
+    --good: #2E7D4F;
+    --good-bg: #E4F4EA;
+    --bad: #B23A3A;
+    --bad-bg: #FBE9E9;
+    --line: #E1E7E8;
+    --radius-lg: 20px;
+    --radius-md: 14px;
+    --radius-sm: 9px;
+    --shadow: 0 1px 2px rgba(20,33,43,0.04), 0 8px 24px -12px rgba(20,33,43,0.12);
+    --shadow-hover: 0 2px 4px rgba(20,33,43,0.06), 0 16px 32px -14px rgba(20,33,43,0.16);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Inter', system-ui, sans-serif;
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+    overflow-x:hidden;
+  }
+  h1,h2,h3,.display{
+    font-family:'Sora', system-ui, sans-serif;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important;}
+  }
+
+  /* ---------- Layout shell ---------- */
+  .page{
+    max-width:920px;
+    margin:0 auto;
+    padding:28px 20px 80px;
+  }
+
+  header.top{
+    position:relative;
+    padding:38px 4px 30px;
+    overflow:hidden;
+  }
+
+  .waves{
+    position:absolute;
+    top:-40px;
+    right:-30px;
+    width:220px;
+    height:220px;
+    pointer-events:none;
+    opacity:0.9;
+  }
+  .waves circle{
+    fill:none;
+    stroke:var(--accent);
+    stroke-width:1.4;
+    opacity:0;
+    transform-origin:center;
+    animation:pulse 3.6s ease-out infinite;
+  }
+  .waves circle:nth-child(2){animation-delay:0.9s; stroke:var(--accent-2);}
+  .waves circle:nth-child(3){animation-delay:1.8s;}
+  @keyframes pulse{
+    0%{ transform:scale(0.35); opacity:0.65; }
+    75%{ transform:scale(1); opacity:0; }
+    100%{ transform:scale(1); opacity:0; }
+  }
+
+  .eyebrow-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    color:var(--accent);
+    font-size:13px;
+    font-weight:600;
+    letter-spacing:0.01em;
+    margin-bottom:10px;
+  }
+  .eyebrow-row .dot{
+    width:7px; height:7px; border-radius:50%;
+    background:var(--accent);
+    box-shadow:0 0 0 4px var(--accent-soft);
+  }
+
+  h1.display{
+    font-size:clamp(28px, 5vw, 40px);
+    font-weight:700;
+    line-height:1.12;
+    margin:0 0 10px;
+    max-width:11ch;
+  }
+
+  .subtitle{
+    color:var(--ink-soft);
+    font-size:15.5px;
+    line-height:1.55;
+    max-width:46ch;
+    margin:0;
+  }
+
+  /* ---------- Tab switcher ---------- */
+  nav.switcher{
+    display:flex;
+    gap:4px;
+    background:var(--surface-2);
+    border-radius:999px;
+    padding:4px;
+    width:fit-content;
+    margin:30px 0 6px;
+    position:relative;
+  }
+  nav.switcher button{
+    position:relative;
+    z-index:2;
+    border:none;
+    background:transparent;
+    font-family:'Inter', sans-serif;
+    font-size:14.5px;
+    font-weight:600;
+    color:var(--ink-soft);
+    padding:10px 20px;
+    border-radius:999px;
+    cursor:pointer;
+    transition:color 0.25s ease;
+    white-space:nowrap;
+  }
+  nav.switcher button.active{color:var(--surface);}
+  nav.switcher .thumb{
+    position:absolute;
+    top:4px; bottom:4px; left:4px;
+    width:calc(50% - 4px);
+    background:var(--accent);
+    border-radius:999px;
+    z-index:1;
+    transition:transform 0.32s cubic-bezier(.65,0,.35,1);
+  }
+  nav.switcher.tab-2 .thumb{ transform:translateX(100%); }
+
+  main{margin-top:26px;}
+  .module{display:none;}
+  .module.active{display:block; animation:fadein 0.35s ease;}
+  @keyframes fadein{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);} }
+
+  /* ================= Flashcards ================= */
+  .fc-toolbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:18px;
+    gap:12px;
+    flex-wrap:wrap;
+  }
+  .fc-count{
+    font-size:13.5px;
+    color:var(--muted);
+    font-weight:500;
+  }
+  .fc-count strong{color:var(--ink); font-weight:600;}
+
+  .fc-progress-track{
+    height:4px;
+    background:var(--surface-2);
+    border-radius:999px;
+    overflow:hidden;
+    margin-bottom:24px;
+  }
+  .fc-progress-fill{
+    height:100%;
+    background:linear-gradient(90deg, var(--accent), var(--accent-2));
+    border-radius:999px;
+    transition:width 0.35s ease;
+  }
+
+  .fc-stage{
+    perspective:1600px;
+    width:100%;
+    max-width:560px;
+    margin:0 auto;
+  }
+  .fc-card{
+    position:relative;
+    width:100%;
+    min-height:280px;
+    cursor:pointer;
+    transform-style:preserve-3d;
+    transition:transform 0.55s cubic-bezier(.65,0,.35,1);
+  }
+  .fc-card.flipped{ transform:rotateY(180deg); }
+  .fc-face{
+    position:absolute;
+    inset:0;
+    backface-visibility:hidden;
+    border-radius:var(--radius-lg);
+    background:var(--surface);
+    box-shadow:var(--shadow);
+    border:1px solid var(--line);
+    padding:32px 30px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:flex-start;
+    gap:14px;
+  }
+  .fc-face .kicker{
+    font-size:12px;
+    font-weight:700;
+    letter-spacing:0.04em;
+    color:var(--accent);
+  }
+  .fc-face.back .kicker{ color:var(--accent-2); }
+  .fc-face p.body-text{
+    font-size:19px;
+    line-height:1.5;
+    font-weight:600;
+    color:var(--ink);
+    margin:0;
+  }
+  .fc-face.back{
+    transform:rotateY(180deg);
+    background:var(--accent-soft-2);
+    border-color:transparent;
+  }
+  .fc-face.back p.body-text{
+    font-size:16.5px;
+    font-weight:500;
+    color:var(--ink);
+  }
+  .fc-hint{
+    font-size:12.5px;
+    color:var(--muted);
+    margin-top:16px;
+    text-align:center;
+  }
+
+  .fc-controls{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:14px;
+    margin-top:26px;
+  }
+  .btn{
+    font-family:'Inter', sans-serif;
+    font-size:14.5px;
+    font-weight:600;
+    border-radius:12px;
+    padding:12px 20px;
+    border:1px solid var(--line);
+    background:var(--surface);
+    color:var(--ink);
+    cursor:pointer;
+    transition:transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+  }
+  .btn:hover{ box-shadow:var(--shadow-hover); border-color:var(--line); transform:translateY(-1px); }
+  .btn:active{ transform:translateY(0); }
+  .btn:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+  .btn:disabled{ opacity:0.4; cursor:not-allowed; transform:none; box-shadow:none; }
+  .btn-primary{
+    background:var(--accent);
+    border-color:var(--accent);
+    color:#fff;
+  }
+  .btn-primary:hover{ background:#285f5b; border-color:#285f5b; }
+  .btn-ghost{
+    background:transparent;
+    border-color:transparent;
+    color:var(--ink-soft);
+  }
+  .btn-icon{
+    width:44px; height:44px;
+    display:flex; align-items:center; justify-content:center;
+    padding:0;
+    border-radius:50%;
+  }
+
+  /* ================= QCM ================= */
+  .q-intro{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    gap:16px;
+    margin-bottom:24px;
+    flex-wrap:wrap;
+  }
+  .score-pill{
+    display:none;
+    align-items:center;
+    gap:8px;
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:999px;
+    padding:9px 16px;
+    font-weight:700;
+    font-size:14.5px;
+    box-shadow:var(--shadow);
+  }
+  .score-pill.show{ display:inline-flex; animation:fadein 0.4s ease; }
+  .score-pill .num{ color:var(--accent); }
+
+  .q-card{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:var(--radius-md);
+    padding:22px 22px 20px;
+    margin-bottom:16px;
+  }
+  .q-num{
+    font-size:12.5px;
+    font-weight:700;
+    color:var(--accent);
+    letter-spacing:0.02em;
+    margin-bottom:8px;
+  }
+  .q-text{
+    font-size:16.5px;
+    font-weight:600;
+    line-height:1.4;
+    margin:0 0 16px;
+  }
+  .q-options{
+    display:flex;
+    flex-direction:column;
+    gap:9px;
+  }
+  .q-option{
+    display:flex;
+    align-items:center;
+    gap:11px;
+    text-align:left;
+    width:100%;
+    background:var(--bg);
+    border:1.5px solid var(--line);
+    border-radius:var(--radius-sm);
+    padding:12px 14px;
+    font-family:'Inter', sans-serif;
+    font-size:14.5px;
+    color:var(--ink);
+    cursor:pointer;
+    transition:border-color 0.15s ease, background 0.15s ease;
+  }
+  .q-option:hover{ border-color:var(--accent-2); }
+  .q-option:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+  .q-option .marker{
+    flex:0 0 auto;
+    width:20px; height:20px;
+    border-radius:50%;
+    border:1.5px solid var(--muted);
+    position:relative;
+  }
+  .q-option.selected{ border-color:var(--accent); background:var(--accent-soft-2); }
+  .q-option.selected .marker{ border-color:var(--accent); }
+  .q-option.selected .marker::after{
+    content:"";
+    position:absolute; inset:3px;
+    border-radius:50%;
+    background:var(--accent);
+  }
+
+  .q-options.locked .q-option{ cursor:default; }
+  .q-option.correct-answer{
+    border-color:var(--good);
+    background:var(--good-bg);
+  }
+  .q-option.correct-answer .marker{ border-color:var(--good); }
+  .q-option.correct-answer .marker::after{ background:var(--good); }
+  .q-option.wrong-answer{
+    border-color:var(--bad);
+    background:var(--bad-bg);
+  }
+  .q-option.wrong-answer .marker{ border-color:var(--bad); }
+  .q-option.wrong-answer .marker::after{ background:var(--bad); }
+
+  .q-explain{
+    display:none;
+    margin-top:14px;
+    padding:12px 14px;
+    border-radius:var(--radius-sm);
+    background:var(--surface-2);
+    font-size:13.5px;
+    line-height:1.5;
+    color:var(--ink-soft);
+  }
+  .q-explain strong{ color:var(--ink); }
+  .q-explain.show{ display:block; animation:fadein 0.3s ease; }
+
+  .q-footer{
+    display:flex;
+    justify-content:center;
+    margin-top:28px;
+    gap:12px;
+  }
+
+  .results-banner{
+    display:none;
+    text-align:center;
+    background:linear-gradient(135deg, var(--accent-soft), var(--accent-soft-2));
+    border-radius:var(--radius-lg);
+    padding:26px 20px;
+    margin-bottom:26px;
+  }
+  .results-banner.show{ display:block; animation:fadein 0.4s ease; }
+  .results-banner .score-big{
+    font-family:'Sora', sans-serif;
+    font-size:40px;
+    font-weight:700;
+    color:var(--ink);
+  }
+  .results-banner .score-sub{
+    font-size:14px;
+    color:var(--ink-soft);
+    margin-top:4px;
+  }
+
+  footer.credit{
+    text-align:center;
+    color:var(--muted);
+    font-size:12.5px;
+    margin-top:60px;
+  }
+
+  @media (max-width: 520px){
+    .fc-card{ min-height:320px; }
+    .fc-face{ padding:26px 22px; }
+    .fc-face p.body-text{ font-size:17px; }
+    header.top{ padding-top:26px; }
+    .waves{ width:160px; height:160px; top:-20px; right:-40px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <header class="top">
+    <svg class="waves" viewBox="0 0 220 220" aria-hidden="true">
+      <circle cx="110" cy="110" r="30"></circle>
+      <circle cx="110" cy="110" r="30"></circle>
+      <circle cx="110" cy="110" r="30"></circle>
+    </svg>
+    <div class="eyebrow-row"><span class="dot"></span>Fiche de révision</div>
+    <h1 class="display">Réseaux Wi-Fi &amp; 802.11</h1>
+    <p class="subtitle">Cartes de révision et QCM d'entraînement générés à partir de vos notes de cours : trames, bandes de fréquences, sécurité et techniques d'antennes.</p>
+
+    <nav class="switcher tab-1" id="switcher">
+      <div class="thumb"></div>
+      <button class="tab-btn active" data-module="flashcards" id="tabBtn1">Flashcards</button>
+      <button class="tab-btn" data-module="qcm" id="tabBtn2">QCM</button>
+    </nav>
+  </header>
+
+  <main>
+    <!-- ================= MODULE 1 : FLASHCARDS ================= -->
+    <section class="module active" id="module-flashcards">
+      <div class="fc-toolbar">
+        <div class="fc-count">Carte <strong id="fcCurrent">1</strong>/<span id="fcTotal">1</span></div>
+        <button class="btn btn-ghost" id="fcShuffle">Mélanger</button>
+      </div>
+      <div class="fc-progress-track"><div class="fc-progress-fill" id="fcProgressFill"></div></div>
+
+      <div class="fc-stage">
+        <div class="fc-card" id="fcCard" tabindex="0" role="button" aria-label="Retourner la carte">
+          <div class="fc-face front">
+            <span class="kicker">Question</span>
+            <p class="body-text" id="fcQuestion"></p>
+          </div>
+          <div class="fc-face back">
+            <span class="kicker">Réponse</span>
+            <p class="body-text" id="fcAnswer"></p>
+          </div>
+        </div>
+        <p class="fc-hint">Cliquez sur la carte pour retourner</p>
+      </div>
+
+      <div class="fc-controls">
+        <button class="btn btn-icon" id="fcPrev" aria-label="Carte précédente">←</button>
+        <button class="btn btn-primary" id="fcFlipBtn">Retourner</button>
+        <button class="btn btn-icon" id="fcNext" aria-label="Carte suivante">→</button>
+      </div>
+    </section>
+
+    <!-- ================= MODULE 2 : QCM ================= -->
+    <section class="module" id="module-qcm">
+      <div class="q-intro">
+        <div>
+          <h2 class="display" style="font-size:20px; margin:0 0 4px;">Questionnaire</h2>
+          <p style="margin:0; color:var(--ink-soft); font-size:14px;">Sélectionnez une réponse par question, puis validez.</p>
+        </div>
+        <div class="score-pill" id="scorePill">Score : <span class="num" id="scoreValue">0/0</span></div>
+      </div>
+
+      <div class="results-banner" id="resultsBanner">
+        <div class="score-big" id="resultsScoreBig">0/10</div>
+        <div class="score-sub" id="resultsScoreSub">Continuez comme ça !</div>
+      </div>
+
+      <div id="quizList"></div>
+
+      <div class="q-footer">
+        <button class="btn btn-ghost" id="quizReset" style="display:none;">Recommencer</button>
+        <button class="btn btn-primary" id="quizSubmit">Valider mes réponses</button>
+      </div>
+    </section>
+  </main>
+
+  <footer class="credit">Généré à partir de vos notes de cours — révisez bien.</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------------------------------------------------------
+     DATA
+  --------------------------------------------------------- */
+  const FLASHCARDS = [
+    { q: "Que signifie l'acronyme Wi-Fi ?", a: "Contraction de « Wireless Fidelity », une certification délivrée par la Wi-Fi Alliance." },
+    { q: "Par quelles normes le Wi-Fi est-il régi ?", a: "Les normes du groupe IEEE 802.11." },
+    { q: "Citez trois avantages du Wi-Fi.", a: "Mobilité complète, faible coût, facilité de déploiement (également : débit suffisant, souplesse d'utilisation, possibilité de grands réseaux)." },
+    { q: "Citez trois inconvénients du Wi-Fi.", a: "Bande de fréquence libre et partagée, sensibilité aux interférences, sensibilité aux dénis de service (également : besoin fort de sécurisation, pas de garantie de bande passante)." },
+    { q: "Que désigne AP dans le vocabulaire Wi-Fi ?", a: "Access Point : le point d'accès sans fil." },
+    { q: "Que désigne STA dans le vocabulaire Wi-Fi ?", a: "Station : le client sans fil." },
+    { q: "Que désigne SSID ?", a: "Service Set IDentifier : le nom d'un réseau sans fil." },
+    { q: "À quel niveau du modèle OSI se situe le Wi-Fi ?", a: "Niveau 2, la couche liaison de données." },
+    { q: "Qu'est-ce qu'une trame de balise (beacon frame) et à quelle fréquence est-elle envoyée ?", a: "Une trame diffusée par l'AP toutes les 100 ms, contenant timestamp, beacon interval, débits supportés, SSID, canal, etc." },
+    { q: "Comment peut-on « cacher » l'existence d'un réseau Wi-Fi ?", a: "En ne diffusant pas le SSID dans la trame de balise." },
+    { q: "Qu'est-ce que le CSMA/CA ?", a: "Une méthode d'accès au support radio partagé, inspirée du CSMA/CD Ethernet : chaque station vérifie que le canal est libre avant d'émettre." },
+    { q: "Quelle est la conséquence d'un grand nombre de stations actives sur un même canal ?", a: "Une augmentation de la latence et une diminution du débit disponible pour chacune, car elles se partagent l'Airtime." },
+    { q: "Qu'est-ce que l'Airtime ?", a: "La durée pendant laquelle un canal radio est occupé pour transmettre ou recevoir des données entre un AP et un appareil." },
+    { q: "Pourquoi un client lent peut-il pénaliser tout le réseau ?", a: "Parce qu'il consomme plus d'Airtime qu'un client rapide pour transmettre la même quantité de données." },
+    { q: "Qui décide de l'association d'une station à un point d'accès ?", a: "C'est la STA (le client) qui décide, selon la distance, le débit et la charge de l'AP." },
+    { q: "Qu'est-ce que le roaming Wi-Fi, et qui le contrôle ?", a: "Le passage d'un AP à un autre en conservant la connectivité ; c'est le client qui décide seul, contrairement au roaming « contrôlé » de la téléphonie mobile, qui n'existe pas en Wi-Fi." },
+    { q: "Combien de canaux sans recouvrement offre la bande 2,4 GHz ?", a: "3 canaux sans recouvrement, sur 13 canaux de 20 MHz." },
+    { q: "Combien de canaux sans recouvrement offre la bande 5 GHz en Europe ?", a: "19 canaux de 20 MHz sans recouvrement." },
+    { q: "Quel est le principal avantage de la bande 2,4 GHz en termes de couverture ?", a: "Une fréquence moyennement absorbée par l'environnement, donc une couverture importante, avec une totale compatibilité des équipements." },
+    { q: "Quel est le principal inconvénient de la bande 5 GHz en termes de couverture ?", a: "Une fréquence plus absorbée par l'environnement, donc une couverture moyenne, malgré des ressources radio plus importantes." },
+    { q: "Que signifie PIRE et que mesure-t-elle ?", a: "Puissance Isotrope Rayonnée Équivalente : la puissance en sortie d'antenne dans la direction où elle est maximale." },
+    { q: "Que signifie DFS et à quoi sert ce mécanisme ?", a: "Dynamic Frequency Selection : il détecte les radars environnants pour changer de fréquence et éviter de les perturber." },
+    { q: "Citez les trois protocoles de chiffrement Wi-Fi évoqués dans le cours.", a: "WPA, WPA2 et WPA3." },
+    { q: "Le protocole WPA est-il aujourd'hui fiable ?", a: "Non, il n'est plus un protocole de chiffrement fiable depuis longtemps et est à éviter." },
+    { q: "Citez des méthodes d'authentification ou de limitation d'accès à un réseau Wi-Fi.", a: "802.1x, le filtrage MAC, le portail captif, la clé unique PSK." },
+    { q: "Qu'est-ce que la technique MIMO ?", a: "Une technique utilisant plusieurs antennes à l'émission et à la réception pour augmenter la portée et/ou le débit." },
+    { q: "Quelles sont les deux principales techniques de MIMO ?", a: "La diversité spatiale (augmentation de la portée) et le multiplexage spatial (augmentation du débit)." },
+    { q: "Qu'est-ce que le Beamforming ?", a: "Une technique MIMO qui oriente et contrôle le faisceau d'onde radio via un réseau d'antennes, pour optimiser la transmission entre émetteur et cible." },
+    { q: "Qu'est-ce que le MU-MIMO et à quelle technologie est-il couplé ?", a: "Une technique permettant de communiquer simultanément avec plusieurs appareils distincts ; elle est couplée à l'OFDMA, qui groupe les terminaux par sous-porteuse (RU)." },
+    { q: "Que représente une augmentation de 3 dB en termes de puissance ?", a: "Une multiplication par 2 de la puissance." },
+    { q: "Quel SNR minimum est nécessaire pour une connexion fiable (bon débit, sans retransmission) ?", a: "Au moins 10 dB dans les deux sens Rx/Tx." },
+    { q: "En dessous de quel SNR y a-t-il un risque de non-fonctionnement ?", a: "En dessous de 6 dB." },
+    { q: "Quels sont les avantages des fréquences hautes ?", a: "Des débits importants : plus la fréquence est haute, plus le débit peut être important." },
+    { q: "Quels sont les inconvénients des fréquences hautes ?", a: "Des portées faibles, car les ondes sont majoritairement absorbées par l'environnement." },
+    { q: "Quels sont les avantages des fréquences basses ?", a: "Des portées importantes : les ondes ont tendance à rebondir sur l'environnement." },
+    { q: "Quels sont les inconvénients des fréquences basses ?", a: "Des débits faibles : plus la fréquence est basse, plus le débit sera faible." },
+    { q: "Que faut-il faire pour émettre plus loin, sachant que la portée diminue quand la fréquence augmente ?", a: "Émettre plus fort." },
+    { q: "Dans une transmission Wi-Fi, comment nomme-t-on le sens AP → STA et le sens STA → AP ?", a: "Tx pour le sens AP vers STA, Rx pour le sens STA vers AP." },
+    { q: "Pourquoi le client est-il considéré comme le « maillon faible » d'une liaison Wi-Fi ?", a: "Il a souvent 1 à 2 antennes (MIMO limité), une antenne de petite taille, une puissance réduite pour économiser l'énergie, et une polarisation aléatoire non fixée." },
+    { q: "Une transmission Wi-Fi est-elle symétrique entre les deux sens ?", a: "Non, elle est généralement asymétrique, au détriment du sens client vers AP." },
+    { q: "Qu'est-ce que le CCI (Co-Channel Interference) ?", a: "Une interférence entre AP émettant sur le même canal : partage de l'Airtime, impactant mais tolérable dans une même zone." },
+    { q: "Qu'est-ce que l'ACI (Adjacent Channel Interference) ?", a: "Une interférence entre canaux qui se chevauchent : très impactante, provoque des retransmissions, non tolérable." },
+    { q: "Quelle bande de fréquence compte très peu de perturbateurs ?", a: "La bande 5 GHz." },
+    { q: "Qu'est-ce que la « respiration de cellule » ?", a: "Une charge importante sur une cellule (interférence) qui fait chuter le SNR, pouvant empêcher les stations les plus éloignées de fonctionner (SNR < 6 dB)." },
+    { q: "Quelle est la couverture d'une antenne omnidirectionnelle ?", a: "360° à l'horizontale, mais seulement 10° à 80° à la verticale." },
+    { q: "Pour quel usage utilise-t-on généralement une antenne directionnelle ?", a: "Pour les liaisons point à point, car elle est conçue pour une plus grande portée." },
+    { q: "Citez les 4 règles d'or de la planification cellulaire.", a: "Limiter le recouvrement des cellules sur un même canal ; préférer un CCI maîtrisé à un ACI ; adapter la largeur de canal à la densité ; adapter la puissance." },
+    { q: "Quels canaux 5 GHz sont utilisables mais déconseillés en Indoor ?", a: "Les canaux 116 et 140." },
+    { q: "Quelle bande est seule utilisable en Outdoor sur le 5 GHz ?", a: "La bande UNII-2E (canaux 100 à 140)." },
+    { q: "Que signifie ESS ?", a: "Extended Service Set : un réseau d'AP utilisant le même SSID sur des canaux différents." },
+    { q: "Que signifie WDS ?", a: "Wireless Distribution System : un réseau de répéteurs avec routes statiques." },
+    { q: "Qu'est-ce que le MESH (802.11s) ?", a: "Un réseau maillé dynamique de répéteurs, basé sur le protocole HWMP (Hybrid Wireless Mesh Protocol)." },
+    { q: "Combien d'AP maximum peut-on « cascader » en uplink MESH ?", a: "Pas plus de 3 AP." },
+    { q: "Quelles normes permettent au réseau d'informer, orienter et accélérer le roaming, même si le terminal reste décisionnaire ?", a: "802.11k (informer), 802.11v (orienter) et 802.11r (accélérer)." },
+    { q: "Pourquoi une bonne couverture Wi-Fi ne garantit-elle pas un bon débit ?", a: "Le débit dépend aussi du niveau reçu, du SNR, des interférences, de la largeur de bande et de l'occupation de l'Airtime." },
+    { q: "Quelle bande privilégier pour la couverture, et laquelle pour la capacité ?", a: "Le 2,4 GHz pour la couverture et la compatibilité ; le 5/6 GHz pour apporter de la capacité." },
+    { q: "Quelle marge minimale faut-il garder entre signal et bruit pour fonctionner ?", a: "Une marge minimale de 6 dB (10 dB pour une connexion fiable, dans les deux sens Rx/Tx)." }
+  ];
+
+  const QUIZ = [
+    {
+      q: "Que signifie l'acronyme SSID ?",
+      options: ["Station Set Identifier", "Service Set IDentifier", "Secure Signal ID", "System Set Interface"],
+      correct: 1,
+      explain: "SSID signifie Service Set IDentifier : c'est le nom diffusé du réseau Wi-Fi."
+    },
+    {
+      q: "À quel niveau du modèle OSI se situe le Wi-Fi ?",
+      options: ["Niveau 1 (physique)", "Niveau 2 (liaison de données)", "Niveau 3 (réseau)", "Niveau 4 (transport)"],
+      correct: 1,
+      explain: "Le cours précise explicitement que le Wi-Fi se situe au niveau 2, la couche liaison de données."
+    },
+    {
+      q: "À quelle fréquence l'AP diffuse-t-il une trame de balise (beacon frame) ?",
+      options: ["Toutes les 10 ms", "Toutes les 100 ms", "Toutes les 1000 ms", "Toutes les 500 ms"],
+      correct: 1,
+      explain: "L'AP diffuse une trame de balise toutes les 100 ms, contenant timestamp, SSID, débits supportés, etc."
+    },
+    {
+      q: "Quelle méthode d'accès au support le Wi-Fi utilise-t-il ?",
+      options: ["CSMA/CD", "TDMA", "CSMA/CA", "FDMA"],
+      correct: 2,
+      explain: "Le Wi-Fi utilise le CSMA/CA, inspiré du CSMA/CD de l'Ethernet mais adapté au support radio partagé."
+    },
+    {
+      q: "Combien de canaux sans recouvrement offre la bande 2,4 GHz ?",
+      options: ["1", "3", "13", "19"],
+      correct: 1,
+      explain: "La bande 2,4 GHz propose 13 canaux de 20 MHz, dont seulement 3 sans recouvrement."
+    },
+    {
+      q: "Combien de canaux sans recouvrement offre la bande 5 GHz en Europe ?",
+      options: ["3", "13", "19", "25"],
+      correct: 2,
+      explain: "La bande 5 GHz offre 19 canaux de 20 MHz sans recouvrement exploitables en Europe."
+    },
+    {
+      q: "Qui décide du roaming vers un autre point d'accès ?",
+      options: ["Le point d'accès (AP)", "Un contrôleur central", "La station cliente (STA)", "La Wi-Fi Alliance"],
+      correct: 2,
+      explain: "En Wi-Fi, c'est le client (STA) qui décide seul, selon son propre algorithme ; le roaming « contrôlé » n'existe pas."
+    },
+    {
+      q: "Quel protocole de chiffrement Wi-Fi n'est plus considéré comme fiable ?",
+      options: ["WPA3", "WPA2", "WPA", "AES"],
+      correct: 2,
+      explain: "Le cours indique que le WPA n'est plus un protocole de chiffrement fiable depuis longtemps et doit être évité."
+    },
+    {
+      q: "Que mesure la PIRE ?",
+      options: [
+        "Le débit maximal théorique du réseau",
+        "La puissance isotrope rayonnée équivalente en sortie d'antenne",
+        "Le nombre de stations connectées",
+        "La latence moyenne du réseau"
+      ],
+      correct: 1,
+      explain: "PIRE = Puissance Isotrope Rayonnée Équivalente, la puissance maximale en sortie d'antenne."
+    },
+    {
+      q: "À quelle technique le MU-MIMO est-il couplé pour grouper les terminaux par sous-porteuse ?",
+      options: ["OFDMA", "Beamforming", "DFS", "CSMA/CA"],
+      correct: 0,
+      explain: "Le MU-MIMO est couplé à l'OFDMA, qui permet de grouper les terminaux par sous-porteuse (RU)."
+    },
+    {
+      q: "Une augmentation de 3 dB correspond à quelle multiplication de la puissance ?",
+      options: ["x1,5", "x2", "x3", "x10"],
+      correct: 1,
+      explain: "3 dB d'augmentation correspondent à une multiplication par 2 de la puissance."
+    },
+    {
+      q: "Quel SNR minimal est nécessaire pour une connexion Wi-Fi fiable, dans les 2 sens Rx/Tx ?",
+      options: ["3 dB", "6 dB", "10 dB", "20 dB"],
+      correct: 2,
+      explain: "Une connexion fiable (bon débit, pas de retransmission) nécessite un SNR d'au moins 10 dB dans les deux sens."
+    },
+    {
+      q: "En dessous de quel SNR y a-t-il un risque de non-fonctionnement ?",
+      options: ["3 dB", "6 dB", "10 dB", "15 dB"],
+      correct: 1,
+      explain: "En dessous de 6 dB, il y a un risque de non-fonctionnement de la connexion."
+    },
+    {
+      q: "Quel est l'inconvénient principal des fréquences hautes ?",
+      options: ["Des débits faibles", "Des portées faibles", "Aucune absorption par l'environnement", "Des interférences nulles"],
+      correct: 1,
+      explain: "Les fréquences hautes offrent de gros débits mais des portées faibles, car les ondes sont majoritairement absorbées par l'environnement."
+    },
+    {
+      q: "Quel est l'avantage principal des fréquences basses ?",
+      options: ["Des débits élevés", "Des portées importantes", "Une latence très faible", "Une sécurité renforcée"],
+      correct: 1,
+      explain: "Les fréquences basses offrent des portées importantes car les ondes ont tendance à rebondir sur l'environnement, au prix d'un débit plus faible."
+    },
+    {
+      q: "Dans une transmission Wi-Fi, quel sens est généralement désavantagé ?",
+      options: ["AP vers STA (Tx)", "STA vers AP (Rx)", "Les deux sens également", "Aucun des deux"],
+      correct: 1,
+      explain: "Une transmission Wi-Fi est généralement asymétrique, au détriment du sens client vers AP (Rx), le client étant le maillon faible."
+    },
+    {
+      q: "Qu'est-ce que le CCI (Co-Channel Interference) ?",
+      options: [
+        "Une interférence entre AP sur des canaux différents non chevauchants",
+        "Une interférence entre AP émettant sur le même canal",
+        "Un protocole de chiffrement Wi-Fi",
+        "Un type d'antenne directionnelle"
+      ],
+      correct: 1,
+      explain: "Le CCI correspond à un partage du même canal entre AP : impactant en latence/débit, mais tolérable dans une même zone."
+    },
+    {
+      q: "Qu'est-ce que l'ACI (Adjacent Channel Interference) ?",
+      options: [
+        "Une interférence entre AP sur le même canal",
+        "Une interférence entre canaux qui se chevauchent",
+        "Un mécanisme de roaming assisté",
+        "Une technique d'authentification"
+      ],
+      correct: 1,
+      explain: "L'ACI est causée par des canaux qui se chevauchent : très impactant, provoque des retransmissions, et n'est pas tolérable."
+    },
+    {
+      q: "Que signifie ESS dans l'architecture Wi-Fi ?",
+      options: ["Extended Service Set", "Enhanced Security System", "Extended Signal Strength", "Ethernet Service Set"],
+      correct: 0,
+      explain: "ESS = Extended Service Set : un réseau d'AP utilisant le même SSID sur des canaux différents."
+    },
+    {
+      q: "Combien d'AP maximum peut-on « cascader » en uplink MESH ?",
+      options: ["2", "3", "5", "10"],
+      correct: 1,
+      explain: "Il ne faut pas cascader plus de 3 AP en uplink MESH."
+    }
+  ];
+
+  /* ---------------------------------------------------------
+     TAB SWITCHING
+  --------------------------------------------------------- */
+  const switcher = document.getElementById('switcher');
+  const tabBtns = document.querySelectorAll('.tab-btn');
+  const modules = document.querySelectorAll('.module');
+
+  tabBtns.forEach((btn, idx) => {
+    btn.addEventListener('click', () => {
+      tabBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      switcher.classList.toggle('tab-2', idx === 1);
+      switcher.classList.toggle('tab-1', idx === 0);
+      modules.forEach(m => m.classList.remove('active'));
+      document.getElementById('module-' + btn.dataset.module).classList.add('active');
+    });
+  });
+
+  /* ---------------------------------------------------------
+     MODULE 1 : FLASHCARDS
+  --------------------------------------------------------- */
+  let cards = FLASHCARDS.slice();
+  let fcIndex = 0;
+  let fcFlipped = false;
+
+  const fcCardEl = document.getElementById('fcCard');
+  const fcQuestionEl = document.getElementById('fcQuestion');
+  const fcAnswerEl = document.getElementById('fcAnswer');
+  const fcCurrentEl = document.getElementById('fcCurrent');
+  const fcTotalEl = document.getElementById('fcTotal');
+  const fcProgressFill = document.getElementById('fcProgressFill');
+  const fcPrevBtn = document.getElementById('fcPrev');
+  const fcNextBtn = document.getElementById('fcNext');
+  const fcFlipBtn = document.getElementById('fcFlipBtn');
+  const fcShuffleBtn = document.getElementById('fcShuffle');
+
+  fcTotalEl.textContent = cards.length;
+
+  function renderCard(){
+    const card = cards[fcIndex];
+    fcQuestionEl.textContent = card.q;
+    fcAnswerEl.textContent = card.a;
+    fcFlipped = false;
+    fcCardEl.classList.remove('flipped');
+    fcCurrentEl.textContent = fcIndex + 1;
+    fcProgressFill.style.width = ((fcIndex + 1) / cards.length * 100) + '%';
+    fcPrevBtn.disabled = fcIndex === 0;
+    fcNextBtn.disabled = fcIndex === cards.length - 1;
+  }
+
+  function flipCard(){
+    fcFlipped = !fcFlipped;
+    fcCardEl.classList.toggle('flipped', fcFlipped);
+  }
+
+  fcCardEl.addEventListener('click', flipCard);
+  fcCardEl.addEventListener('keydown', (e) => {
+    if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); flipCard(); }
+  });
+  fcFlipBtn.addEventListener('click', flipCard);
+
+  fcPrevBtn.addEventListener('click', () => {
+    if(fcIndex > 0){ fcIndex--; renderCard(); }
+  });
+  fcNextBtn.addEventListener('click', () => {
+    if(fcIndex < cards.length - 1){ fcIndex++; renderCard(); }
+  });
+
+  fcShuffleBtn.addEventListener('click', () => {
+    for(let i = cards.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i + 1));
+      [cards[i], cards[j]] = [cards[j], cards[i]];
+    }
+    fcIndex = 0;
+    renderCard();
+  });
+
+  renderCard();
+
+  /* ---------------------------------------------------------
+     MODULE 2 : QCM
+  --------------------------------------------------------- */
+  const quizListEl = document.getElementById('quizList');
+  const quizSubmitBtn = document.getElementById('quizSubmit');
+  const quizResetBtn = document.getElementById('quizReset');
+  const scorePill = document.getElementById('scorePill');
+  const scoreValueEl = document.getElementById('scoreValue');
+  const resultsBanner = document.getElementById('resultsBanner');
+  const resultsScoreBig = document.getElementById('resultsScoreBig');
+  const resultsScoreSub = document.getElementById('resultsScoreSub');
+
+  const answers = new Array(QUIZ.length).fill(null);
+  let submitted = false;
+
+  function buildQuiz(){
+    quizListEl.innerHTML = '';
+    QUIZ.forEach((item, qIdx) => {
+      const card = document.createElement('div');
+      card.className = 'q-card';
+      card.innerHTML = `
+        <div class="q-num">Question ${qIdx + 1}/${QUIZ.length}</div>
+        <p class="q-text">${item.q}</p>
+        <div class="q-options" data-qindex="${qIdx}"></div>
+        <div class="q-explain" data-explain="${qIdx}"><strong>Explication :</strong> ${item.explain}</div>
+      `;
+      const optionsWrap = card.querySelector('.q-options');
+      item.options.forEach((optText, optIdx) => {
+        const optBtn = document.createElement('button');
+        optBtn.type = 'button';
+        optBtn.className = 'q-option';
+        optBtn.dataset.qindex = qIdx;
+        optBtn.dataset.optindex = optIdx;
+        optBtn.innerHTML = `<span class="marker"></span><span>${optText}</span>`;
+        optBtn.addEventListener('click', () => selectOption(qIdx, optIdx));
+        optionsWrap.appendChild(optBtn);
+      });
+      quizListEl.appendChild(card);
+    });
+  }
+
+  function selectOption(qIdx, optIdx){
+    if(submitted) return;
+    answers[qIdx] = optIdx;
+    const optionsWrap = quizListEl.querySelector(`.q-options[data-qindex="${qIdx}"]`);
+    optionsWrap.querySelectorAll('.q-option').forEach(btn => {
+      btn.classList.toggle('selected', parseInt(btn.dataset.optindex, 10) === optIdx);
+    });
+  }
+
+  function gradeQuiz(){
+    let score = 0;
+    QUIZ.forEach((item, qIdx) => {
+      const optionsWrap = quizListEl.querySelector(`.q-options[data-qindex="${qIdx}"]`);
+      optionsWrap.classList.add('locked');
+      const userAnswer = answers[qIdx];
+      const isCorrect = userAnswer === item.correct;
+      if(isCorrect) score++;
+
+      optionsWrap.querySelectorAll('.q-option').forEach(btn => {
+        const optIdx = parseInt(btn.dataset.optindex, 10);
+        btn.disabled = true;
+        if(optIdx === item.correct){
+          btn.classList.add('correct-answer');
+        } else if(optIdx === userAnswer && !isCorrect){
+          btn.classList.add('wrong-answer');
+        }
+      });
+
+      quizListEl.querySelector(`.q-explain[data-explain="${qIdx}"]`).classList.add('show');
+    });
+
+    submitted = true;
+    scoreValueEl.textContent = score + '/' + QUIZ.length;
+    scorePill.classList.add('show');
+
+    resultsScoreBig.textContent = score + '/' + QUIZ.length;
+    const pct = score / QUIZ.length;
+    resultsScoreSub.textContent = pct === 1
+      ? "Sans faute, excellent travail !"
+      : pct >= 0.7
+      ? "Très solide, encore un peu de révision et c'est parfait."
+      : pct >= 0.4
+      ? "Pas mal, revoyez les points manqués ci-dessous."
+      : "Reprenez les notions ci-dessous, vous allez progresser vite.";
+    resultsBanner.classList.add('show');
+    resultsBanner.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+    quizSubmitBtn.style.display = 'none';
+    quizResetBtn.style.display = 'inline-flex';
+  }
+
+  quizSubmitBtn.addEventListener('click', () => {
+    if(submitted) return;
+    gradeQuiz();
+  });
+
+  function resetQuiz(){
+    answers.fill(null);
+    submitted = false;
+    scorePill.classList.remove('show');
+    resultsBanner.classList.remove('show');
+    quizSubmitBtn.style.display = 'inline-flex';
+    quizResetBtn.style.display = 'none';
+    buildQuiz();
+  }
+
+  quizResetBtn.addEventListener('click', resetQuiz);
+
+  buildQuiz();
+
+})();
+</script>
+</body>
+</html>
