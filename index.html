@@ -504,13 +504,13 @@
       <div class="q-intro">
         <div>
           <h2 class="display" style="font-size:20px; margin:0 0 4px;">Questionnaire</h2>
-          <p style="margin:0; color:var(--ink-soft); font-size:14px;">Sélectionnez une réponse par question, puis validez.</p>
+          <p style="margin:0; color:var(--ink-soft); font-size:14px;">20 questions tirées au hasard parmi les 73 notions du cours, renouvelées à chaque tentative. Sélectionnez une réponse par question, puis validez.</p>
         </div>
         <div class="score-pill" id="scorePill">Score : <span class="num" id="scoreValue">0/0</span></div>
       </div>
 
       <div class="results-banner" id="resultsBanner">
-        <div class="score-big" id="resultsScoreBig">0/10</div>
+        <div class="score-big" id="resultsScoreBig">0/20</div>
         <div class="score-sub" id="resultsScoreSub">Continuez comme ça !</div>
       </div>
 
@@ -590,7 +590,23 @@
     { q: "Quelles normes permettent au réseau d'informer, orienter et accélérer le roaming, même si le terminal reste décisionnaire ?", a: "802.11k (informer), 802.11v (orienter) et 802.11r (accélérer)." },
     { q: "Pourquoi une bonne couverture Wi-Fi ne garantit-elle pas un bon débit ?", a: "Le débit dépend aussi du niveau reçu, du SNR, des interférences, de la largeur de bande et de l'occupation de l'Airtime." },
     { q: "Quelle bande privilégier pour la couverture, et laquelle pour la capacité ?", a: "Le 2,4 GHz pour la couverture et la compatibilité ; le 5/6 GHz pour apporter de la capacité." },
-    { q: "Quelle marge minimale faut-il garder entre signal et bruit pour fonctionner ?", a: "Une marge minimale de 6 dB (10 dB pour une connexion fiable, dans les deux sens Rx/Tx)." }
+    { q: "Quelle marge minimale faut-il garder entre signal et bruit pour fonctionner ?", a: "Une marge minimale de 6 dB (10 dB pour une connexion fiable, dans les deux sens Rx/Tx)." },
+    { q: "Que signifie le champ « Supported rates » d'une trame de balise ?", a: "Les débits supportés par l'AP, exprimés en Mbits/s." },
+    { q: "Que représente le champ « Direct Sequence (DS) » d'une trame de balise ?", a: "Le canal radio utilisé par l'AP." },
+    { q: "Quel est l'espacement entre les canaux de la bande 2,4 GHz ?", a: "5 MHz." },
+    { q: "Dans quels pays les canaux 12 et 13 de la bande 2,4 GHz sont-ils utilisables ?", a: "En Europe et au Japon uniquement." },
+    { q: "Pour quels usages la bande 5 GHz est-elle généralement utilisée ?", a: "Les réseaux sans-fil artériels, le backbone radio, l'interconnexion point à point et la distribution client (Wi-Fi 5 et 6)." },
+    { q: "Pourquoi les grands réseaux en bande 2,4 GHz sont-ils complexes à mettre en œuvre ?", a: "Parce que la bande 2,4 GHz dispose de ressources radio très limitées et est souvent perturbée." },
+    { q: "Que signifie LPI ?", a: "Low Power Indoor." },
+    { q: "Que signifie VLP ?", a: "Very Low Power." },
+    { q: "Quelles sont les deux méthodes pour dissimuler un réseau Wi-Fi ?", a: "La non-diffusion du SSID et/ou le décalage fréquentiel." },
+    { q: "Pourquoi le Wi-Fi a-t-il une mauvaise réputation en matière de sécurité ?", a: "À cause des failles importantes du WEP et des défauts de sécurisation des box grand public." },
+    { q: "Que dit le cours sur la controverse sanitaire liée au Wi-Fi ?", a: "La communauté scientifique n'arrive pas à se prononcer clairement sur le risque des radiofréquences, avec un amalgame fréquent avec la téléphonie mobile." },
+    { q: "Pourquoi dit-on que « le Wi-Fi n'est pas magique » ?", a: "Parce que la couverture radio est limitée par l'environnement et la puissance, et que la ressource radio n'est pas illimitée." },
+    { q: "Que se passe-t-il pour l'Airtime nécessaire quand on s'éloigne d'un AP ?", a: "La distance et les obstacles atténuent le signal (baisse du SNR/MCS), ce qui augmente l'Airtime nécessaire pour transmettre la même quantité de données." },
+    { q: "Que faut-il privilégier pour le transport plutôt que des répéteurs ou un MESH simple sur un seul départ ?", a: "Une infrastructure filaire." },
+    { q: "Faut-il concevoir un réseau Wi-Fi uniquement pour la couverture ?", a: "Non : il faut concevoir pour la capacité, la couverture efficace variant en fonction de la charge (respiration de cellule)." },
+    { q: "Quelle précaution prendre avec une largeur de canal supérieure à 40 MHz en 5 GHz ?", a: "Elle est à manier avec précaution." }
   ];
 
   const QUIZ = [
@@ -728,8 +744,110 @@
       options: ["2", "3", "5", "10"],
       correct: 1,
       explain: "Il ne faut pas cascader plus de 3 AP en uplink MESH."
+    },
+    {
+      q: "Quel est l'espacement entre les canaux de la bande 2,4 GHz ?",
+      options: ["5 MHz", "10 MHz", "20 MHz", "25 MHz"],
+      correct: 0,
+      explain: "Les canaux de la bande 2,4 GHz sont espacés de 5 MHz."
+    },
+    {
+      q: "Dans une trame de balise, que représente le champ « Direct Sequence (DS) » ?",
+      options: ["Le débit supporté", "Le canal utilisé", "Le nom du réseau", "L'horodatage"],
+      correct: 1,
+      explain: "Le champ Direct Sequence (DS) indique le canal radio utilisé par l'AP."
+    },
+    {
+      q: "Que signifie LPI ?",
+      options: ["Low Power Indoor", "Local Power Interface", "Limited Power Input", "Long Prefix Identifier"],
+      correct: 0,
+      explain: "LPI signifie Low Power Indoor."
+    },
+    {
+      q: "Quelles sont les deux méthodes pour dissimuler un réseau Wi-Fi ?",
+      options: [
+        "Chiffrement et authentification",
+        "Non-diffusion du SSID et/ou décalage fréquentiel",
+        "Filtrage MAC et portail captif",
+        "DFS et PIRE"
+      ],
+      correct: 1,
+      explain: "On peut cacher un réseau Wi-Fi en ne diffusant pas le SSID et/ou par un décalage fréquentiel."
+    },
+    {
+      q: "Que faut-il privilégier pour le transport plutôt qu'un répéteur ou un MESH simple sur un seul départ ?",
+      options: ["Une infrastructure filaire", "Un second AP", "Un répéteur supplémentaire", "Une antenne directionnelle"],
+      correct: 0,
+      explain: "Il faut privilégier une infrastructure filaire pour le transport ; les systèmes de type répéteur ou MESH simple sur un seul départ sont à éviter."
+    },
+    {
+      q: "Quelle est la cause principale de la mauvaise réputation du Wi-Fi en matière de sécurité ?",
+      options: ["Les failles du WEP et la mauvaise sécurisation des box grand public", "Le CSMA/CA", "Le MU-MIMO", "Le Beamforming"],
+      correct: 0,
+      explain: "Cette mauvaise réputation vient des failles importantes du WEP et des défauts de sécurisation des box grand public."
+    },
+    {
+      q: "Que se passe-t-il pour l'Airtime nécessaire quand on s'éloigne d'un AP ?",
+      options: ["Il diminue", "Il reste stable", "Il augmente", "Il devient nul"],
+      correct: 2,
+      explain: "La distance atténue le signal (baisse du SNR/MCS), ce qui augmente l'Airtime nécessaire pour transmettre la même quantité de données."
+    },
+    {
+      q: "Faut-il concevoir un réseau Wi-Fi uniquement pour la couverture ?",
+      options: ["Oui, toujours", "Non, il faut concevoir pour la capacité", "Seulement en intérieur", "Seulement en 2,4 GHz"],
+      correct: 1,
+      explain: "Il faut concevoir pour la capacité, pas uniquement pour la couverture, car celle-ci varie avec la charge (respiration de cellule)."
     }
   ];
+
+  const QUIZ_LENGTH = 20;
+
+  function shuffleArray(source){
+    const arr = source.slice();
+    for(let i = arr.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
+
+  // Génère automatiquement une question à choix multiples pour chaque flashcard :
+  // la réponse de la carte devient la bonne réponse, et 3 réponses d'autres cartes
+  // servent de propositions erronées.
+  function buildAutoQuestionsFromFlashcards(cards){
+    return cards.map((card, idx) => {
+      const otherAnswers = cards
+        .filter((_, i) => i !== idx)
+        .map(c => c.a)
+        .filter(a => a !== card.a);
+      const distractors = shuffleArray(otherAnswers).slice(0, 3);
+      return {
+        q: card.q,
+        options: [card.a, ...distractors],
+        correct: 0,
+        explain: card.a
+      };
+    });
+  }
+
+  // Banque de questions combinée : les questions rédigées à la main (plus riches en
+  // distracteurs plausibles) et une question générée pour chacune des 73 flashcards,
+  // sans doublon de question.
+  function buildQuestionPool(){
+    const pool = [];
+    const seen = new Set();
+    QUIZ.forEach(item => {
+      const key = item.q.trim().toLowerCase();
+      if(!seen.has(key)){ seen.add(key); pool.push(item); }
+    });
+    buildAutoQuestionsFromFlashcards(FLASHCARDS).forEach(item => {
+      const key = item.q.trim().toLowerCase();
+      if(!seen.has(key)){ seen.add(key); pool.push(item); }
+    });
+    return pool;
+  }
+
+  const QUESTION_POOL = buildQuestionPool();
 
   /* ---------------------------------------------------------
      TAB SWITCHING
@@ -822,16 +940,32 @@
   const resultsScoreBig = document.getElementById('resultsScoreBig');
   const resultsScoreSub = document.getElementById('resultsScoreSub');
 
-  const answers = new Array(QUIZ.length).fill(null);
+  let answers = [];
   let submitted = false;
+  let currentQuiz = [];
+
+  function makeShuffledQuiz(){
+    // Tire QUIZ_LENGTH questions au hasard dans la banque combinée (questions rédigées
+    // à la main + une question par flashcard), puis mélange l'ordre des propositions
+    // de chaque question en recalculant l'index de la bonne réponse.
+    const picked = shuffleArray(QUESTION_POOL).slice(0, QUIZ_LENGTH);
+    return picked.map(item => {
+      const order = shuffleArray(item.options.map((_, idx) => idx));
+      const options = order.map(idx => item.options[idx]);
+      const correct = order.indexOf(item.correct);
+      return { q: item.q, options, correct, explain: item.explain };
+    });
+  }
 
   function buildQuiz(){
+    currentQuiz = makeShuffledQuiz();
+    answers = new Array(currentQuiz.length).fill(null);
     quizListEl.innerHTML = '';
-    QUIZ.forEach((item, qIdx) => {
+    currentQuiz.forEach((item, qIdx) => {
       const card = document.createElement('div');
       card.className = 'q-card';
       card.innerHTML = `
-        <div class="q-num">Question ${qIdx + 1}/${QUIZ.length}</div>
+        <div class="q-num">Question ${qIdx + 1}/${currentQuiz.length}</div>
         <p class="q-text">${item.q}</p>
         <div class="q-options" data-qindex="${qIdx}"></div>
         <div class="q-explain" data-explain="${qIdx}"><strong>Explication :</strong> ${item.explain}</div>
@@ -862,7 +996,7 @@
 
   function gradeQuiz(){
     let score = 0;
-    QUIZ.forEach((item, qIdx) => {
+    currentQuiz.forEach((item, qIdx) => {
       const optionsWrap = quizListEl.querySelector(`.q-options[data-qindex="${qIdx}"]`);
       optionsWrap.classList.add('locked');
       const userAnswer = answers[qIdx];
@@ -883,11 +1017,11 @@
     });
 
     submitted = true;
-    scoreValueEl.textContent = score + '/' + QUIZ.length;
+    scoreValueEl.textContent = score + '/' + currentQuiz.length;
     scorePill.classList.add('show');
 
-    resultsScoreBig.textContent = score + '/' + QUIZ.length;
-    const pct = score / QUIZ.length;
+    resultsScoreBig.textContent = score + '/' + currentQuiz.length;
+    const pct = score / currentQuiz.length;
     resultsScoreSub.textContent = pct === 1
       ? "Sans faute, excellent travail !"
       : pct >= 0.7
@@ -908,7 +1042,6 @@
   });
 
   function resetQuiz(){
-    answers.fill(null);
     submitted = false;
     scorePill.classList.remove('show');
     resultsBanner.classList.remove('show');
